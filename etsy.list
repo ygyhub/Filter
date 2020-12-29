@@ -1,5 +1,15 @@
 # Etsy
-DOMAIN-SUFFIX,www.etsy.com,Proxy
-DOMAIN-SUFFIX,i.etsystatic.com,Proxy
+DOMAIN-SUFFIX,adsrvr.org,Proxy
+DOMAIN-SUFFIX,btncdn.com,Proxy
+DOMAIN-SUFFIX,doubleclick.net,Proxy
+DOMAIN-SUFFIX,etsy.com,Proxy
+DOMAIN-SUFFIX,etsystatic.com,Proxy
+DOMAIN-SUFFIX,gstatic.com,Proxy
 DOMAIN-SUFFIX,pt.ispot.tv,Proxy
 DOMAIN-SUFFIX,dwin1.com,Proxy
+DOMAIN-SUFFIX,doubleclick.net,Proxy
+DOMAIN-SUFFIX,pinimg.com,Proxy
+DOMAIN-SUFFIX,sentry-cdn.com,Proxy
+DOMAIN-SUFFIX,trkn.us,Proxy
+DOMAIN-SUFFIX,xg4ken.com,Proxy
+
