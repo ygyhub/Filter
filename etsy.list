@@ -1,3 +1,5 @@
 # Etsy
 DOMAIN-SUFFIX,www.etsy.com,Proxy
 DOMAIN-SUFFIX,i.etsystatic.com,Proxy
+DOMAIN-SUFFIX,pt.ispot.tv,Proxy
+DOMAIN-SUFFIX,dwin1.com,Proxy
