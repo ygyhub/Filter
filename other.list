@@ -1,0 +1,22 @@
+# > Other
+DOMAIN, sip.hori-gz.com, direct
+DOMAIN, adfile.hori-gz.com, reject
+DOMAIN, bd.hori-gz.com, reject
+DOMAIN, mms.hori-gz.com, reject
+DOMAIN, yxhd.hori-gz.com, reject
+DOMAIN-suffix, lxjapp.com, reject
+DOMAIN, lxj.hori-gz.com, reject
+DOMAIN-suffix, mlinks.cc, reject
+#DOMAIN-suffix, hori-gz.com, reject
+DOMAIN-suffix, tenhou.net, proxy
+DOMAIN-suffix, fireside.fm, proxy
+DOMAIN-suffix, pocketcasts.com, proxy
+DOMAIN-SUFFIX,flixamz.tk,proxy
+DOMAIN-SUFFIX,sms-activate.ru,proxy
+DOMAIN,speed.cloudflare.com,proxy
+DOMAIN-SUFFIX,jable.tv,proxy
+DOMAIN,dlercloud.speedtestcustom.com,proxy
+DOMAIN-SUFFIX,reface.video,proxy
+DOMAIN-suffix, mjv.jp, Gamer
+DOMAIN-SUFFIX,clashroyaleapp.com,Gamer
+DOMAIN-SUFFIX,clashroyale.com,Gamer
