@@ -1,0 +1,14 @@
+host, www11c1.53kf.com, reject
+host, nfys-static.kinglian.cn, reject
+host, lxjapp.com, reject
+host, sso.lxjapp.com, reject
+host, hmma.baidu.com, reject
+host, adfile.hori-gz.com, reject
+host, bd.hori-gz.com, reject
+host, mms.hori-gz.com, reject
+host, yxhd.hori-gz.com, reject
+host-suffix, lxjapp.com, reject
+host, lxj.hori-gz.com, reject
+host-suffix, mlinks.cc, reject
+#host-suffix, hori-gz.com, reject
+host, umeng.com, reject
