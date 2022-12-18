@@ -3,6 +3,7 @@ payload:
   - 'bd.hori-gz.com'
   - 'mms.hori-gz.com'
   - 'yxhd.hori-gz.com'
-  - 'lxjapp.com'
   - 'lxj.hori-gz.com'
+  - 'lxjapp.com'
+  - 'sso.lxjapp.com'
   - 'mlinks.cc'
