@@ -4,6 +4,7 @@ payload:
   - 'mms.hori-gz.com'
   - 'yxhd.hori-gz.com'
   - 'lxj.hori-gz.com'
+  - 'vpms.hori-gz.com'
   - 'lxjapp.com'
   - 'sso.lxjapp.com'
   - 'mlinks.cc'
