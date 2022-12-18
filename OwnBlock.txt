@@ -8,3 +8,4 @@ payload:
   - 'lxjapp.com'
   - 'sso.lxjapp.com'
   - 'mlinks.cc'
+  - 'umeng.com'
