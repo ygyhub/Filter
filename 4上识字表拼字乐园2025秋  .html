@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>拼字乐园 - 优化版</title>
+    <style>
+        :root {
+            --sky: #A8D8FF;
+            --coral: #FFA1B5;
+            --leaf: #C3E8BD;
+            --cream: #FFF5D6;
+            --lavender: #D6C2FF;
+            --white: #FFFFFF;
+            --dark-blue: #4A6B3F;
+        }
+
+        body {
+            font-family: 'Source Han Sans', 'Noto Sans SC', 'PingFang SC', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--sky);
+            min-height: 100vh;
+            transition: background-color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .app-title {
+            text-align: center;
+            color: var(--white);
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+            font-size: 3em;
+            margin: 20px 0;
+            letter-spacing: 2px;
+            animation: float 3s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Source Han Serif', 'Noto Serif SC', serif;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--coral);
+            font-size: 1.8em;
+            margin-bottom: 30px;
+            font-weight: bold;
+            font-family: 'Source Han Sans', 'Noto Sans SC', sans-serif;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .main-page {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .unit-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .unit-button {
+            padding: 20px;
+            background: var(--lavender);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: 'Source Han Sans', 'Noto Sans SC', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .unit-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .unit-icon {
+            font-size: 1.5em;
+        }
+
+        /* 拼字卡片样式 */
+        .puzzle-page {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .puzzle-card {
+            font-size: 6em;
+            margin: 50px auto;
+            cursor: pointer;
+            padding: 50px;
+            border-radius: 50px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            width: 95%;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid rgba(255, 255, 255, 0.5);
+            background: var(--leaf);
+            color: var(--dark-blue);
+            transition: background 0.3s;
+            position: relative;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .components {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            max-width: 100%;
+            font-size: 1.2em;
+        }
+
+        .component-item {
+            padding: 0 15px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+
+        .component-red { color: #FF5252; }
+        .component-yellow { color: #FFD740; }
+        .component-blue { color: #448AFF; }
+        .component-green { color: #66BB6A; }
+        .component-purple { color: #BA68C8; }
+        .component-operator { color: var(--coral); }
+
+        .equal {
+            font-size: 1.2em;
+            margin: 0 25px;
+        }
+
+        .answer {
+            animation: pop 0.3s ease-out;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+
+        .progress-container {
+            height: 10px;
+            background-color: var(--cream);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--coral);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-slider {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            background: var(--white);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .progress-tooltip {
+            position: absolute;
+            top: -35px;
+            left: 0;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            white-space: nowrap;
+            display: none;
+            z-index: 20;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            90% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: var(--lavender);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .word-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            font-size: 0.6em;
+        }
+
+        .word-item {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            color: #4A6B3F;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .pinyin {
+            font-size: 0.6em;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .unit-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .puzzle-card {
+                min-height: 400px;
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .app-title {
+                font-size: 2.5em;
+            }
+
+            .subtitle {
+                font-size: 1.5em;
+            }
+
+            .puzzle-card {
+                font-size: 4.5em;
+                min-height: 350px;
+            }
+
+            .unit-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 2em;
+            }
+
+            .subtitle {
+                font-size: 1.2em;
+            }
+
+            .puzzle-card {
+                font-size: 3.5em;
+                min-height: 300px;
+                padding: 20px;
+            }
+
+            .components span {
+                font-size: 0.8em;
+            }
+            
+            .word-group {
+                font-size: 0.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 主页面 - 单元选择 -->
+    <div class="container main-page" id="mainPage">
+        <h1 class="app-title">
+            🌈 拼字乐园 ✨
+        </h1>
+        <h2 class="subtitle">四年级上识字表</h2>
+        <div class="unit-buttons">
+            <button class="unit-button" onclick="startPuzzle('第一课')">
+                <span class="unit-icon">1️⃣</span> 第一课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第二课')">
+                <span class="unit-icon">2️⃣</span> 第二课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第三课')">
+                <span class="unit-icon">3️⃣</span> 第三课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第四课')">
+                <span class="unit-icon">4️⃣</span> 第四课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第五课')">
+                <span class="unit-icon">5️⃣</span> 第五课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第六课')">
+                <span class="unit-icon">6️⃣</span> 第六课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第七课')">
+                <span class="unit-icon">7️⃣</span> 第七课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第八课')">
+                <span class="unit-icon">8️⃣</span> 第八课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('语文园地1')">
+                <span class="unit-icon">1️⃣</span> 语文园地1
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第九课')">
+                <span class="unit-icon">9️⃣</span>第九课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十课')">
+                <span class="unit-icon">🔟</span> 第十课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十一课')">
+                <span class="unit-icon"> <i>1️⃣</i><i>1️⃣</i></span> 第十一课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十二课')">
+                <span class="unit-icon"><i>1️⃣</i><i>2️⃣</i></span> 第十二课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十三课')">
+                <span class="unit-icon"> <i>1️⃣</i><i>3️⃣</i></span> 第十三课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十四课')">
+                <span class="unit-icon"><i>1️⃣</i><i>4️⃣</i></span> 第十四课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十五课')">
+                <span class="unit-icon"><i>1️⃣</i><i>5️⃣</i></span> 第十五课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('语文园地2')">
+                <span class="unit-icon">2️⃣</span> 语文园地2
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十六课')">
+                <span class="unit-icon"> <i>1️⃣</i><i>6️⃣</i></span> 第十六课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十七课')">
+                <span class="unit-icon"><i>1️⃣</i><i>7️⃣</i></span> 第十七课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十八课')">
+                <span class="unit-icon"> <i>1️⃣</i><i>8️⃣</i></span> 第十八课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第十九课')">
+                <span class="unit-icon"><i>1️⃣</i><i>9️⃣</i></span> 第十九课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第二十课')">
+                <span class="unit-icon"><i>2️⃣</i><i>0️⃣</i></span> 第二十课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('语文园地3')">
+                <span class="unit-icon">3️⃣</span> 语文园地3
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第二十一课')">
+                <span class="unit-icon"><i>2️⃣</i><i>1️⃣</i></span> 第二十一课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第二十二课')">
+                <span class="unit-icon"><i>2️⃣</i><i>2️⃣</i></span> 第二十二课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第二十三课')">
+                <span class="unit-icon"><i>2️⃣</i><i>3️⃣</i></span> 第二十三课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第二十四课')">
+                <span class="unit-icon"><i>2️⃣</i><i>4️⃣</i></span>第二十四课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第二十五课')">
+                <span class="unit-icon"><i>2️⃣</i><i>5️⃣</i></span> 第二十五课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第二十六课')">
+                <span class="unit-icon"> <i>2️⃣</i><i>6️⃣</i></span> 第二十六课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('第二十七课')">
+                <span class="unit-icon"> <i>2️⃣</i><i>7️⃣</i></span>第二十七课
+            </button>
+            <button class="unit-button" onclick="startPuzzle('语文园地4')">
+                <span class="unit-icon">4️⃣</span> 语文园地4
+            </button>
+        </div>
+        <div class="footer">
+            关注小红书：塔塔自习室 | 分享更多不费妈学习神器 | 版权保护 侵权必究 | 售后联系 GAOTATA20
+        </div>
+    </div>
+
+    <!-- 拼字页面 -->
+    <div class="container puzzle-page" id="puzzlePage">
+        <button class="back-btn" onclick="showPage('main')">← 返回选择</button>
+        <div style="margin-top: 40px;"></div>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-slider" id="progressSlider"></div>
+            <div class="progress-tooltip" id="progressTooltip"></div>
+        </div>
+        <div class="puzzle-card" id="puzzleCard" onclick="handleCardClick()">
+            <div class="components" id="puzzleContent"></div>
+            <div class="word-group" id="wordGroup"></div>
+            <div class="pinyin" id="pinyin"></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            currentPuzzleData: [],
+            currentPuzzleIndex: 0,
+            isShowingAnswer: false,
+            currentFileName: ''
+        };
+
+        // 颜色列表
+        const colors = ['component-red', 'component-yellow', 'component-blue', 'component-green', 'component-purple'];
+
+        // 课时数据结构（已省略完整数据）
+        const unitData = {
+ "第一课": [
+    {"character": "盐", "components": "土+卜+皿", "words": ["食盐", "盐水", "海盐", "盐湖"]},
+    {"character": "薄", "components": "艹+氵+甫+寸", "words": ["薄雾", "薄弱", "薄饼", "薄情"]},
+    {"character": "屹", "components": "山+乞", "words": ["屹立", "屹然", "屹屹", "巍屹"]},
+    {"character": "昂", "components": "曰+卬", "words": ["昂贵", "昂扬", "昂首", "高昂"]},
+    {"character": "沸", "components": "氵+弗", "words": ["沸腾", "沸点", "沸水", "人声鼎沸"]},
+    {"character": "贯", "components": "惯-忄", "words": ["贯穿", "贯通", "一贯", "贯注"]},
+    {"character": "浩", "components": "氵+告", "words": ["浩瀚", "浩大", "浩荡", "浩渺"]},
+    {"character": "崩", "components": "山+朋", "words": ["崩塌", "崩溃", "崩裂", "山崩"]},
+    {"character": "震", "components": "雨+辰", "words": ["地震", "震动", "震惊", "震撼"]},
+    {"character": "霎", "components": "雨+妾", "words": ["霎时", "一霎", "霎眼", "霎时间"]},
+    {"character": "余", "components": "𠆢+一+朩", "words": ["剩余", "余数", "余晖", "富余"]},
+    {"character": "恢", "components": "忄+灰", "words": ["恢复", "恢弘", "恢廓", "恢宏"]}
+  ],
+  "第二课": [
+    {"character": "鹅", "components": "我+鸟", "words": ["天鹅", "鹅毛", "企鹅", "鹅卵石"]},
+    {"character": "卵", "components": "卯+丶+丶", "words": ["卵石", "卵生", "产卵", "以卵击石"]},
+    {"character": "俗", "components": "亻+谷", "words": ["风俗", "俗气", "习俗", "雅俗共赏"]},
+    {"character": "跃", "components": "⻊+夭", "words": ["跳跃", "跃进", "飞跃", "跃跃欲试"]},
+    {"character": "穗", "components": "禾+惠", "words": ["稻穗", "麦穗", "穗子", "抽穗"]},
+    {"character": "镀", "components": "钅+度", "words": ["电镀", "镀金", "镀层", "镀锌"]},
+    {"character": "埂", "components": "土+更", "words": ["田埂", "土埂", "埂子", "堤埂"]},
+    {"character": "烁", "components": "火+乐", "words": ["闪烁", "烁亮", "烁金", "震古烁今"]}
+  ],
+  "第三课": [
+    {"character": "巢", "components": "巛+果", "words": ["鸟巢", "巢穴", "蜂巢", "老巢"]},
+    {"character": "苇", "components": "艹+韦", "words": ["芦苇", "苇席", "苇塘", "苇子"]},
+    {"character": "罗", "components": "罒+夕", "words": ["罗网", "罗列", "罗汉", "罗盘"]},
+    {"character": "霸", "components": "雨+革+月", "words": ["霸道", "霸权", "霸主", "霸占"]},
+    {"character": "占", "components": "沾-氵", "words": ["占领", "占据", "占用", "占卜"]}
+  ],
+  "第四课": [
+    {"character": "昧", "components": "日+未", "words": ["愚昧", "冒昧", "暧昧", "拾金不昧"]},
+    {"character": "坠", "components": "队+土", "words": ["坠落", "坠毁", "下坠", "耳坠"]},
+    {"character": "怀", "components": "忄+不", "words": ["怀抱", "怀念", "胸怀", "怀旧"]}
+  ],
+  "第五课": [
+    {"character": "豌", "components": "豆+宛", "words": ["豌豆", "豌豆苗", "豌豆黄", "豌豆荚"]},
+    {"character": "僵", "components": "亻+畺", "words": ["僵硬", "僵持", "僵局", "冻僵"]},
+    {"character": "预", "components": "予+页", "words": ["预防", "预备", "预测", "干预"]},
+    {"character": "揭", "components": "扌+曷", "words": ["揭开", "揭露", "揭晓", "揭穿"]},
+    {"character": "苔", "components": "艹+台", "words": ["苔藓", "青苔", "苔原", "海苔"]},
+    {"character": "囚", "components": "囗+人", "words": ["囚犯", "囚禁", "囚徒", "死囚"]},
+    {"character": "框", "components": "木+匡", "words": ["框架", "门框", "画框", "条条框框"]},
+    {"character": "溢", "components": "氵+益", "words": ["溢出", "洋溢", "溢满", "溢于言表"]}
+  ],
+  "第六课": [
+    {"character": "蝙", "components": "虫+扁", "words": ["蝙蝠", "蝙蝠侠", "蝙蝠衫"]},
+    {"character": "蝠", "components": "虫+畐", "words": ["蝙蝠", "蝠鲼", "蝠蛇", "红蝠"]},
+    {"character": "即", "components": "唧-口", "words": ["立即", "即将", "即刻", "即使"]},
+    {"character": "锐", "components": "钅+兑", "words": ["锐利", "敏锐", "尖锐", "锐气"]},
+    {"character": "系", "components": "ノ+幺+小", "words": ["系统", "关系", "联系", "系列"]},
+    {"character": "铛", "components": "钅+当", "words": ["铃铛", "锒铛", "铛铛", "响铛铛"]},
+    {"character": "蝇", "components": "虫+黾", "words": ["苍蝇", "蝇头", "蝇蛆", "灭蝇"]},
+    {"character": "证", "components": "讠+正", "words": ["证明", "证据", "证件", "证书"]},
+    {"character": "障", "components": "阝+章", "words": ["障碍", "屏障", "保障", "障眼法"]},
+    {"character": "碍", "components": "石+曰+一+寸", "words": ["妨碍", "阻碍", "碍事", "障碍"]},
+    {"character": "荧", "components": "艹+冖+火", "words": ["荧光", "荧幕",  "荧屏"]},
+    {"character": "屏", "components": "尸+并", "words": ["屏幕", "屏障", "屏风", "屏住"]}
+  ],
+  "第七课": [
+    {"character": "唤", "components": "口+奂", "words": ["呼唤", "唤醒", "唤起", "召唤"]},
+    {"character": "纪", "components": "纟+己", "words": ["纪律", "世纪", "纪念", "纪实"]},
+    {"character": "获", "components": "艹+犭+犬", "words": ["收获", "获得", "获取", "捕获"]},
+    {"character": "赖", "components": "束+负", "words": ["依赖", "无赖", "赖皮", "抵赖"]},
+    {"character": "潜", "components": "氵+替", "words": ["潜水", "潜力", "潜伏", "潜移默化"]},
+    {"character": "亿", "components": "亻+乙", "words": ["亿万", "一亿", "十亿", "亿兆"]},
+    {"character": "索", "components": "十+冖+糸", "words": ["探索", "索取", "线索", "绳索"]},
+    {"character": "奥", "components": "澳-氵", "words": ["奥秘", "深奥", "奥运会", "奥妙"]},
+    {"character": "舶", "components": "舟+白", "words": ["船舶", "舶来品", "海舶", "商舶"]},
+    {"character": "质", "components": "𠂆+十+贝", "words": ["质量", "本质", "物质", "质疑"]},
+    {"character": "哲", "components": "折+口", "words": ["哲学", "哲理", "先哲", "明哲"]}
+  ],
+  "第八课": [
+    {"character": "避", "components": "辶+辟", "words": ["躲避", "避免", "避开", "避暑"]},
+    {"character": "撼", "components": "扌+感", "words": ["震撼", "撼动", "摇撼", "撼天动地"]},
+    {"character": "喧", "components": "口+宣", "words": ["喧闹", "喧嚣", "喧哗", "锣鼓喧天"]},
+    {"character": "雀", "components": "小+隹", "words": ["麻雀", "孔雀", "雀跃", "鸦雀无声"]},
+    {"character": "檐", "components": "木+詹", "words": ["屋檐", "房檐", "檐下", "帽檐"]}
+  ],
+  "语文园地1": [
+    {"character": "驻", "components": "马+主", "words": ["驻扎", "驻守", "驻地", "驻军"]},
+    {"character": "钞", "components": "钅+少", "words": ["钞票", "现钞", "验钞", "钞写"]},
+    {"character": "培", "components": "土+咅", "words": ["培养", "培训", "培育", "培土"]},
+    {"character": "赌", "components": "贝+者", "words": ["赌博", "赌注", "赌徒", "打赌"]},
+    {"character": "媒", "components": "女+某", "words": ["媒体", "媒介", "媒人", "传媒"]},
+    {"character": "氛", "components": "气+分", "words": ["氛围", "气氛", "战氛", "祥氛"]},
+    {"character": "账", "components": "贝+长", "words": ["账单", "账本", "记账", "欠账"]},
+    {"character": "贺", "components": "加+贝", "words": ["祝贺", "贺卡", "庆贺", "贺喜"]},
+    {"character": "樟", "components": "木+章", "words": ["樟树", "樟木", "樟脑", "香樟"]},
+    {"character": "杠", "components": "木+工", "words": ["杠杆", "抬杠", "杠铃", "单杠"]},
+    {"character": "狡", "components": "犭+交", "words": ["狡猾", "狡诈", "狡辩", "狡黠"]},
+    {"character": "猾", "components": "犭+骨", "words": ["狡猾", "奸猾", "猾吏", "老奸巨猾"]}
+  ],
+  "第九课": [
+    {"character": "暮", "components": "莫+曰", "words": ["暮色", "日暮", "暮年", "朝暮"]},
+    {"character": "瑟", "components": "王+王+必", "words": ["瑟瑟", "琴瑟", "萧瑟", "瑟缩"]},
+    {"character": "缘", "components": "纟+彖", "words": ["缘分", "缘故", "边缘", "无缘"]},
+    {"character": "降", "components": "阝+夅", "words": ["降落", "下降", "降低", "降温"]},
+    {"character": "骚", "components": "马+蚤", "words": ["骚扰", "骚动", "牢骚", "风骚"]},
+    {"character": "逊", "components": "辶+孙", "words": ["逊色", "谦逊", "不逊", "逊位"]},
+    {"character": "输", "components": "车+俞", "words": ["运输", "输赢", "输入", "认输"]}
+  ],
+  "第十课": [
+    {"character": "均", "components": "土+匀", "words": ["平均", "均匀", "均衡", "均等"]},
+    {"character": "柄", "components": "木+丙", "words": ["把柄", "手柄", "叶柄", "笑柄"]},
+    {"character": "蜗", "components": "虫+呙", "words": ["蜗牛", "蜗居", "蜗行", "蜗杆"]},
+    {"character": "曲", "components": "由+丨", "words": ["弯曲", "曲线", "戏曲", "歌曲"]},
+    {"character": "萎", "components": "艹+委", "words": ["枯萎", "萎缩", "萎靡", "萎蔫"]}
+  ],
+  "第十一课": [
+    {"character": "宅", "components": "宀+乇", "words": ["住宅", "宅院", "宅基", "家宅"]},
+    {"character": "隐", "components": "阝+急", "words": ["隐藏", "隐蔽", "隐约", "隐私"]},
+    {"character": "毫", "components": "亠+口+冖+毛", "words": ["毫米", "丝毫", "毫毛", "狼毫"]},
+    {"character": "慎", "components": "忄+真", "words": ["谨慎", "慎重", "不慎", "慎独"]},
+    {"character": "址", "components": "土+止", "words": ["地址", "遗址", "住址", "校址"]},
+    {"character": "良", "components": "丶+艮", "words": ["良好", "优良", "良心", "良性"]},
+    {"character": "掘", "components": "扌+屈", "words": ["挖掘", "发掘", "掘土", "掘进"]},
+    {"character": "搜", "components": "扌+叟", "words": ["搜索", "搜集", "搜查", "搜身"]},
+    {"character": "倾", "components": "亻+顷", "words": ["倾斜", "倾听", "倾向", "倾盆"]},
+    {"character": "骤", "components": "马+聚", "words": ["步骤", "骤雨", "骤然", "步骤"]},
+    {"character": "置", "components": "罒+直", "words": ["位置", "放置", "布置", "置办"]},
+    {"character": "抛", "components": "扌+九+力", "words": ["抛弃", "抛开", "抛掷", "抛售"]}
+  ],
+  "第十二课": [
+    {"character": "劈", "components": "辟+刀", "words": ["劈开", "劈柴", "劈头盖脸", "劈叉"]},
+    {"character": "缓", "components": "纟+爰", "words": ["缓慢", "缓解", "缓和", "缓冲"]},
+    {"character": "浊", "components": "氵+虫", "words": ["浑浊", "浊音", "浊流", "浊世"]},
+    {"character": "丈", "components": "仗-亻", "words": ["丈夫", "丈量", "方丈", "一丈"]},
+    {"character": "隆", "components": "阝+夂+一+生", "words": ["隆重", "隆起", "兴隆", "隆冬"]},
+    {"character": "肢", "components": "月+支", "words": ["肢体", "四肢", "假肢", "前肢"]},
+    {"character": "躯", "components": "身+区", "words": ["躯体", "身躯", "躯干", "捐躯"]},
+    {"character": "液", "components": "氵+夜", "words": ["液体", "血液", "溶液", "液晶"]}
+  ],
+  "第十三课": [
+    {"character": "少", "components": "沙-氵", "words": ["多少", "少数", "减少", "缺少"]},
+    {"character": "曰", "components": "口+一", "words": ["子曰", "美其名曰", "读曰", "曰若"]},
+    {"character": "溺", "components": "氵+弱", "words": ["溺水", "溺爱", "溺死", "沉溺"]},
+    {"character": "返", "components": "辶+反", "words": ["返回", "往返", "返程", "返工"]}
+  ],
+  "第十四课": [
+    {"character": "斯", "components": "其+斤", "words": ["斯文", "瓦斯", "斯人", "慢条斯理"]},
+    {"character": "惨", "components": "忄+参", "words": ["悲惨", "惨烈", "惨痛", "惨状"]},
+    {"character": "盗", "components": "次+皿", "words": ["盗窃", "盗贼", "强盗", "盗版"]},
+    {"character": "驰", "components": "马+也", "words": ["奔驰", "驰骋", "飞驰", "驰名"]},
+    {"character": "恕", "components": "如+心", "words": ["宽恕", "饶恕", "恕罪", "恕难从命"]},
+    {"character": "押", "components": "扌+甲", "words": ["押金", "关押", "押运", "画押"]},
+    {"character": "锁", "components": "钅+⺌+贝", "words": ["锁门", "锁定", "封锁", "锁链"]},
+    {"character": "遭", "components": "辶+曹", "words": ["遭遇", "遭受", "遭殃", "遭罪"]},
+    {"character": "恶", "components": "亚+心", "words": ["恶心", "凶恶", "恶毒", "厌恶"]},
+    {"character": "脏", "components": "月+庄", "words": ["肮脏", "脏话", "脏乱", "脏水"]},
+    {"character": "愤", "components": "忄+贲", "words": ["愤怒", "气愤", "愤恨", "愤慨"]},
+    {"character": "砸", "components": "石+匚+巾", "words": ["砸碎", "砸坏", "砸开", "砸伤"]}
+  ],
+  "第十五课": [
+    {"character": "洪", "components": "氵+共", "words": ["洪水", "洪亮", "洪灾", "洪福"]},
+    {"character": "措", "components": "扌+昔", "words": ["措施", "举措", "措辞", "手足无措"]},
+    {"character": "混", "components": "氵+昆", "words": ["混乱", "混合", "混淆", "混浊"]},
+    {"character": "项", "components": "工+页", "words": ["项目", "项链", "事项", "选项"]},
+    {"character": "熄", "components": "火+息", "words": ["熄灭", "熄灯", "熄火", "熄掉"]},
+    {"character": "浆", "components": "丬+夕+水", "words": ["豆浆", "浆果", "浆洗", "泥浆"]},
+    {"character": "塌", "components": "土+曰+羽", "words": ["倒塌", "塌方", "塌陷", "塌实"]},
+    {"character": "窜", "components": "穴+串", "words": ["逃窜", "窜改", "流窜", "点窜"]},
+    {"character": "颂", "components": "公+页", "words": ["歌颂", "颂扬", "颂歌", "传颂"]},
+    {"character": "绩", "components": "纟+责", "words": ["成绩", "业绩", "功绩", "绩效"]}
+  ],
+  "语文园地2": [
+    {"character": "圃", "components": "囗+甫", "words": ["花圃", "苗圃", "菜圃", "园圃"]},
+    {"character": "卉", "components": "十+廾", "words": ["花卉", "奇花异卉", "卉木", "卉茵"]},
+    {"character": "蕾", "components": "艹+雷", "words": ["花蕾", "蓓蕾", "蕾丝", "芭蕾"]},
+    {"character": "蕊", "components": "艹+心+心+心", "words": ["花蕊", "雄蕊", "雌蕊", "石蕊"]},
+    {"character": "玫", "components": "王+攵", "words": ["玫瑰", "玫红", "玫瑰饼", "黄玫瑰"]},
+    {"character": "茉", "components": "艹+末", "words": ["茉莉", "茉莉花", "紫茉莉", "素茉"]},
+    {"character": "莉", "components": "艹+利", "words": ["茉莉", "莉娜", "莉香", "佳莉"]},
+    {"character": "牡", "components": "牜+土", "words": ["牡丹", "牡蛎", "牡牛", "牡马"]},
+    {"character": "丹", "components": "彤-彡", "words": ["丹心", "丹药", "丹青", "牡丹"]},
+    {"character": "棠", "components": "尚+木", "words": ["海棠", "棠梨", "棠棣", "秋海棠"]}
+  ],
+  "第十六课": [
+    {"character": "嗅", "components": "口+臭", "words": ["嗅觉", "嗅到", "嗅探", "嗅闻"]},
+    {"character": "奈", "components": "大+示", "words": ["无奈", "奈何", "怎奈", "奈良"]},
+    {"character": "拯", "components": "扌+丞", "words": ["拯救", "拯治", "拯恤", "拯溺"]},
+    {"character": "嘶", "components": "口+斯", "words": ["嘶哑", "嘶鸣", "嘶叫", "嘶喊"]},
+    {"character": "哑", "components": "口+亚", "words": ["哑巴", "哑铃", "哑剧", "沙哑"]},
+    {"character": "庞", "components": "广+龙", "words": ["庞大", "庞杂", "脸庞", "庞然大物"]}
+  ],
+  "第十七课": [
+    {"character": "级", "components": "纟+及", "words": ["年级", "级别", "高级", "等级"]},
+    {"character": "链", "components": "钅+连", "words": ["链条", "项链", "链接", "锁链"]},
+    {"character": "攀", "components": "林+ 爻+ 大 + 手", "words": ["攀登", "攀爬", "攀谈", "攀比"]},
+    {"character": "相", "components": "木+目", "words": ["相信", "互相", "相对", "相识"]},
+    {"character": "辫", "components": "辡+纟", "words": ["辫子", "发辫", "小辫", "辫发"]},
+    {"character": "呵", "components": "口+可", "words": ["呵护", "呵斥", "呵欠", "呵呵"]}
+  ],
+  "第十八课": [
+    {"character": "谓", "components": "讠+胃", "words": ["所谓", "谓语", "称谓", "无所谓"]},
+    {"character": "拳", "components": "丷+夫+手", "words": ["拳头", "拳击", "拳脚", "拳术"]},
+    {"character": "捶", "components": "扌+垂", "words": ["捶打", "捶背", "捶胸", "捶衣裳"]},
+    {"character": "顽", "components": "元+页", "words": ["顽皮", "顽固", "顽强", "顽疾"]},
+    {"character": "吁", "components": "口+于", "words": ["呼吁", "吁请", "吁求", "气喘吁吁"]},
+    {"character": "襟", "components": "衤+禁", "words": ["衣襟", "胸襟", "襟怀", "对襟"]},
+    {"character": "膊", "components": "月+尃", "words": ["胳膊", "赤膊", "臂膊"]},
+    {"character": "瓶", "components": "并+瓦", "words": ["瓶子", "花瓶", "瓶盖", "瓶口"]},
+    {"character": "怖", "components": "忄+布", "words": ["恐怖", "可怖", "怖畏", "怖惧"]},
+    {"character": "凭", "components": "任+几", "words": ["凭借", "凭空", "凭据", "凭证"]},
+    {"character": "欺", "components": "其+欠", "words": ["欺负", "欺骗", "欺诈", "欺压"]},
+    {"character": "掐", "components": "扌+⺈+臼", "words": ["掐指", "掐算", "掐死", "掐断"]}
+  ],
+  "第十九课": [
+    {"character": "囊", "components": "一+中+冖+襄-亠", "words": ["行囊", "囊肿", "囊括", "胆囊"]},
+    {"character": "露", "components": "雨+路", "words": ["露水", "露珠", "暴露", "透露"]},
+    {"character": "羡", "components": "姜-女+次", "words": ["羡慕", "艳羡", "羡余", "钦羡"]},
+    {"character": "角", "components": "⺈+用", "words": ["角落", "角度", "角色", "直角"]},
+    {"character": "殷", "components": "㐆+殳", "words": ["殷勤", "殷切", "殷实", "殷红"]},
+    {"character": "盔", "components": "灰+皿", "words": ["头盔", "盔甲", "钢盔", "锅盔"]},
+    {"character": "撇", "components": "扌+敝", "words": ["撇开", "撇捺", "撇号", "撇嘴"]},
+    {"character": "啊", "components": "口+阿", "words": ["啊呀", "啊哟", "啊哈", "啊唷"]},
+    {"character": "霉", "components": "雨+每", "words": ["发霉", "倒霉", "霉菌", "霉变"]},
+    {"character": "亏", "components": "一+丂", "words": ["吃亏", "亏损", "亏本", "幸亏"]},
+    {"character": "哄", "components": "口+共", "words": ["哄骗", "哄抢", "哄堂大笑", "哄动"]},
+    {"character": "拙", "components": "扌+出", "words": ["笨拙", "拙劣", "拙见", "弄巧成拙"]},
+    {"character": "唉", "components": "口+矣", "words": ["唉声叹气", "唉呀", "唉哟", "唉叹"]}
+  ],
+  "第二十课": [
+    {"character": "钉", "components": "钅+丁", "words": ["钉子", "铁钉", "钉鞋", "钉耙"]},
+    {"character": "况", "components": "冫+兄", "words": ["情况", "状况", "况且", "何况"]},
+    {"character": "兵", "components": "丘+八", "words": ["士兵", "当兵", "兵马俑", "兵蚁"]},
+    {"character": "败", "components": "贝+攵", "words": ["失败", "打败", "败仗", "腐败"]},
+    {"character": "恨", "components": "忄+艮", "words": ["仇恨", "怨恨", "悔恨", "痛恨"]},
+    {"character": "帅", "components": "师-一", "words": ["元帅", "帅气", "统帅", "帅才"]},
+    {"character": "彻", "components": "彳+切", "words": ["彻底", "透彻", "贯彻", "彻夜"]},
+    {"character": "溃", "components": "氵+贵", "words": ["溃败", "溃烂", "崩溃", "溃退"]},
+    {"character": "誉", "components": "兴+言", "words": ["荣誉", "名誉", "信誉", "声誉"]},
+    {"character": "丑", "components": "扭-扌", "words": ["丑陋", "丑闻", "丑恶", "小丑"]},
+    {"character": "豪", "components": "亠+口+冖+豕", "words": ["自豪", "豪华", "豪爽", "豪门"]}
+  ],
+  "语文园地3": [
+    {"character": "韭", "components": "非+一", "words": ["韭菜", "韭黄", "韭花", "春韭"]},
+    {"character": "芹", "components": "艹+斤", "words": ["芹菜", "水芹", "芹献", "采芹"]},
+    {"character": "蒜", "components": "艹+示+示", "words": ["大蒜", "蒜头", "蒜苗", "蒜泥"]},
+    {"character": "椒", "components": "木+叔", "words": ["辣椒", "花椒", "胡椒", "椒盐"]},
+    {"character": "藕", "components": "艹+耦", "words": ["莲藕", "藕粉", "藕荷", "藕节"]},
+    {"character": "薯", "components": "艹+署", "words": ["红薯", "白薯", "薯条", "马铃薯"]},
+    {"character": "芋", "components": "艹+于", "words": ["芋头", "山芋", "魔芋", "洋芋"]}
+  ],
+  "第二十一课": [
+    {"character": "塞", "components": "赛-贝+土", "words": ["堵塞", "塞车", "塞满", "塞子"]},
+    {"character": "秦", "components": "三+人+禾", "words": ["秦朝", "秦岭", "秦腔", "先秦"]},
+    {"character": "征", "components": "彳+正", "words": ["长征", "征收", "特征", "征服"]},
+    {"character": "将", "components": "丬+夕+寸", "words": ["将军", "将来", "将要", "将就"]},
+    {"character": "杰", "components": "木+灬", "words": ["杰出", "豪杰", "俊杰", "杰作"]}
+  ],
+  "第二十二课": [
+    {"character": "崛", "components": "山+屈", "words": ["崛起", "崛立", "崛兴", "奇崛"]},
+    {"character": "范", "components": "艹+氾", "words": ["范围", "模范", "规范", "示范"]},
+    {"character": "魏", "components": "委+鬼", "words": ["北魏", "魏国", "围魏救赵", "魏碑"]},
+    {"character": "晰", "components": "日+析", "words": ["清晰", "明晰", "白晰"]},
+    {"character": "效", "components": "交+攵", "words": ["效果", "效率", "效益", "功效"]},
+    {"character": "淮", "components": "氵+隹", "words": ["淮河", "淮海", "淮北", "淮剧"]},
+    {"character": "惑", "components": "或+心", "words": ["迷惑", "疑惑", "困惑", "诱惑"]},
+    {"character": "惩", "components": "征+心", "words": ["惩罚", "惩处", "惩治", "惩办"]},
+    {"character": "训", "components": "讠+川", "words": ["训练", "教训", "培训", "军训"]},
+    {"character": "斥", "components": "斤+丶", "words": ["斥责", "排斥", "斥候", "斥力"]},
+    {"character": "难", "components": "又+隹", "words": ["困难", "难题", "难受", "难民"]}
+  ],
+  "第二十三课": [
+    {"character": "蓄", "components": "艹+畜", "words": ["储蓄", "蓄水", "蓄意", "蓄电池"]},
+    {"character": "迫", "components": "辶+白", "words": ["压迫", "迫使", "迫切", "迫近"]},
+    {"character": "租", "components": "禾+且", "words": ["租金", "租房", "租用", "出租"]},
+    {"character": "纠", "components": "纟+丩", "words": ["纠正", "纠纷", "纠结", "纠察"]},
+    {"character": "缠", "components": "纟+广+里", "words": ["缠绕", "纠缠", "缠住", "缠绵"]},
+    {"character": "邀", "components": "辶+敫", "words": ["邀请", "邀约", "特邀", "邀功"]},
+    {"character": "港", "components": "氵+巷", "words": ["港口", "香港", "港湾", "港币"]},
+    {"character": "扰", "components": "扌+尤", "words": ["打扰", "干扰", "扰乱", "扰民"]},
+    {"character": "拒", "components": "扌+巨", "words": ["拒绝", "抗拒", "拒捕", "拒之门外"]},
+    {"character": "签", "components": "⺮+佥", "words": ["签名", "签字", "签订", "标签"]},
+    {"character": "订", "components": "讠+丁", "words": ["订正", "订票", "订单", "订阅"]},
+    {"character": "宁", "components": "宀+丁", "words": ["宁静", "安宁", "宁可", "宁愿"]},
+    {"character": "要", "components": "覀+女", "words": ["要求", "重要", "需要", "要素"]},
+    {"character": "妄", "components": "亡+女", "words": ["妄想", "狂妄", "妄图", "妄为"]}
+  ],
+  "第二十四课": [
+    {"character": "延", "components": "廴+ノ+止", "words": ["延长", "延迟", "延伸", "拖延"]},
+    {"character": "昔", "components": "惜-忄", "words": ["昔日", "往昔", "今昔", "昔年"]},
+    {"character": "茅", "components": "艹+矛", "words": ["茅草", "茅屋", "茅舍", "茅台"]},
+    {"character": "炕", "components": "火+亢", "words": ["火炕", "炕头", "炕席", "炕桌"]},
+    {"character": "旦", "components": "日+一", "words": ["元旦", "一旦", "旦夕", "花旦"]},
+    {"character": "媚", "components": "女+眉", "words": ["妩媚", "明媚", "谄媚", "媚眼"]}
+  ],
+  "第二十五课": [
+    {"character": "戎", "components": "绒-纟", "words": ["戎装", "戎马", "兵戎", "戎机"]},
+    {"character": "诸", "components": "讠+者", "words": ["诸多", "诸位", "诸侯", "诸如"]},
+    {"character": "竞", "components": "立+兄", "words": ["竞争", "竞赛", "竞选", "竞技"]},
+    {"character": "唯", "components": "口+隹", "words": ["唯一", "唯独", "唯心", "唯恐"]}
+  ],
+  "第二十六课": [
+    {"character": "豹", "components": "豸+勺", "words": ["豹子", "雪豹", "猎豹", "金钱豹"]},
+    {"character": "娶", "components": "耳+又+女", "words": ["娶妻", "娶亲", "嫁娶", "迎娶"]},
+    {"character": "媳", "components": "女+息", "words": ["媳妇", "儿媳", "婆媳", "弟媳"]},
+    {"character": "巫", "components": "工+人+人", "words": ["巫术", "巫婆", "巫师", "巫山"]},
+    {"character": "绅", "components": "纟+申", "words": ["绅士", "绅耆", "绅带", "土豪劣绅"]},
+    {"character": "旱", "components": "曰+干", "words": ["干旱", "旱灾", "旱季", "旱田"]},
+    {"character": "徒", "components": "彳+走", "words": ["徒弟", "徒步", "徒劳", "学徒"]},
+    {"character": "吊", "components": "口+巾", "words": ["吊车", "吊桥", "吊灯", "吊床"]},
+    {"character": "磕", "components": "石+去+皿", "words": ["磕头", "磕碰", "磕打", "磕巴"]},
+    {"character": "凿", "components": "丵+凵", "words": ["开凿", "凿子", "凿井", "确凿"]},
+    {"character": "溉", "components": "氵+既", "words": ["灌溉", "溉田", "溉灌", "浇溉"]}
+  ],
+  "第二十七课": [
+    {"character": "拜", "components": "湃-氵", "words": ["拜访", "拜拜", "崇拜", "拜师"]},
+    {"character": "侯", "components": "候-丨", "words": ["诸侯", "侯爵", "王侯", "侯门"]},
+    {"character": "肤", "components": "月+夫", "words": ["皮肤", "肤色", "肌肤", "肤浅"]},
+    {"character": "扎", "components": "扌+乚", "words": ["扎实", "扎根", "扎针", "扎营"]},
+    {"character": "剂", "components": "齐+刂", "words": ["药剂", "剂量", "针剂", "试剂"]},
+    {"character": "髓", "components": "骨+辶+左+月", "words": ["骨髓", "精髓", "脊髓", "脑髓"]},
+    {"character": "纪", "components": "纟+己", "words": ["纪律", "世纪", "纪念", "纪实"]},
+    {"character": "标", "components": "木+示", "words": ["目标", "标准", "标志", "标签"]}
+  ],
+  "语文园地4": [
+    {"character": "纲", "components": "纟+冈", "words": ["纲领", "大纲", "提纲", "纲目"]},
+    {"character": "授", "components": "扌+受", "words": ["教授", "传授", "授权", "授课"]},
+    {"character": "揍", "components": "扌+奏", "words": ["挨揍", "揍人", "揍一顿", "找揍"]},
+    {"character": "键", "components": "钅+建", "words": ["键盘", "关键", "琴键", "键入"]},
+    {"character": "谱", "components": "讠+普", "words": ["谱写", "乐谱", "谱曲", "家谱"]},
+    {"character": "锈", "components": "钅+秀", "words": ["生锈", "铁锈", "锈蚀", "铜锈"]},
+    {"character": "沫", "components": "氵+末", "words": ["泡沫", "唾沫", "沫子", "肥皂沫"]},
+    {"character": "砖", "components": "石+专", "words": ["砖头", "砖块", "瓷砖", "砖瓦"]},
+    {"character": "矿", "components": "石+广", "words": ["矿石", "矿物", "煤矿", "铁矿"]},
+    {"character": "综", "components": "纟+宗", "words": ["综合", "综艺", "综述", "错综"]},
+    {"character": "氧", "components": "气+羊", "words": ["氧气", "氧化", "缺氧", "二氧化碳"]},
+    {"character": "俱", "components": "亻+具", "words": ["俱全", "俱乐部", "俱备", "俱到"]}
+            ]
+        };
+
+        // 多音字字典
+        const polyphoneDict = {
+            "行": ["xíng", "háng"],
+            "乐": ["lè", "yuè"],
+            "长": ["cháng", "zhǎng"],
+            "重": ["zhòng", "chóng"],
+            "朝": ["cháo", "zhāo"],
+            "传": ["chuán", "zhuàn"],
+            "都": ["dōu", "dū"],
+            "发": ["fā", "fà"],
+            "分": ["fēn", "fèn"],
+            "好": ["hǎo", "hào"],
+            "空": ["kōng", "kòng"],
+            "难": ["nán", "nàn"],
+            "少": ["shǎo", "shào"],
+            "为": ["wèi", "wéi"],
+            "相": ["xiāng", "xiàng"],
+            "应": ["yīng", "yìng"],
+            "中": ["zhōng", "zhòng"],
+            "着": ["zhe", "zháo", "zhuó"],
+            "数": ["shù", "shǔ"],
+            "只": ["zhī", "zhǐ"],
+            "会": ["huì", "kuài"],
+            "觉": ["jué", "jiào"],
+            "当": ["dāng", "dàng"],
+            "更": ["gēng", "gèng"],
+            "还": ["hái", "huán"],
+            "得": ["dé", "de", "děi"],
+            "地": ["dì", "de"],
+            "没": ["méi", "mò"],
+           "薄": ["báo", "bó", "bò"],
+           "系": ["xì", "jì"],
+           "雀": ["què", "qiāo", "qiǎo"],
+           "降": ["jiàng", "xiáng"],
+           "曲": ["qū", "qǔ"],
+            "少": ["shǎo", "shào"],
+           "脏": ["zāng", "zàng"],
+           "相": ["xiāng", "xiàng"],
+           "吁": ["xū", "yù"],
+           "露": ["lù", "lòu"],
+           "角": ["jiǎo", "jué"],
+           "啊": ["ā", "á", "ǎ", "à", "a"],
+           "哄": ["hōng", "hǒng", "hòng"],
+           "唉": ["āi", "ài"],
+           "钉": ["dīng", "dìng"],
+           "将": ["jiāng", "jiàng", "qiāng"],
+           "难": ["nán", "nàn"],
+           "宁": ["níng", "nìng"],
+           "要": ["yào", "yāo"],
+           "扎": ["zhā", "zā", "zhá"],
+           "纪": ["jì", "jǐ"]   
+     };
+
+        function showPage(page) {
+            document.getElementById('mainPage').style.display = page === 'main' ? 'block' : 'none';
+            document.getElementById('puzzlePage').style.display = page === 'puzzle' ? 'block' : 'none';
+        }
+
+        function startPuzzle(unitName) {
+            state.currentPuzzleData = unitData[unitName] || [];
+            
+            if (state.currentPuzzleData.length === 0) {
+                alert(`该单元 ${unitName} 没有可用的数据`);
+                return;
+            }
+            
+            state.currentFileName = unitName;
+            state.currentPuzzleIndex = 0;
+            state.isShowingAnswer = false;
+            showPage('puzzle');
+            updatePuzzleDisplay();
+        }
+
+        function updatePuzzleDisplay() {
+            const puzzle = state.currentPuzzleData[state.currentPuzzleIndex];
+            if (!puzzle) return;
+
+            // 处理加减运算
+            const components = puzzle.components.split(/[\+\-]/);
+            const operators = puzzle.components.split('').filter(c => c === '+' || c === '-');
+            
+            const content = document.getElementById('puzzleContent');
+            content.innerHTML = '';
+            
+            // 清空组词和拼音
+            document.getElementById('wordGroup').innerHTML = '';
+            document.getElementById('pinyin').innerHTML = '';
+            
+            if (state.isShowingAnswer) {
+                let displayComponents = [];
+                for (let i = 0; i < components.length; i++) {
+                    const span = document.createElement('span');
+                    span.className = `component-item ${colors[i % colors.length]}`;
+                    span.textContent = components[i];
+                    content.appendChild(span);
+                    
+                    if (i < operators.length) {
+                        const opSpan = document.createElement('span');
+                        opSpan.className = 'component-item component-operator';
+                        opSpan.textContent = operators[i];
+                        content.appendChild(opSpan);
+                    }
+                }
+                
+                const equalSpan = document.createElement('span');
+                equalSpan.className = 'equal';
+                equalSpan.textContent = '= ';
+                content.appendChild(equalSpan);
+                
+                const charSpan = document.createElement('span');
+                charSpan.className = 'component-item answer';
+                charSpan.textContent = puzzle.character;
+                content.appendChild(charSpan);
+                
+                // 显示组词
+                if (puzzle.words) {
+                    const wordGroup = document.getElementById('wordGroup');
+                    puzzle.words.forEach(word => {
+                        const wordSpan = document.createElement('span');
+                        wordSpan.className = 'word-item';
+                        wordSpan.textContent = word;
+                        wordGroup.appendChild(wordSpan);
+                    });
+                }
+                
+                // 显示拼音
+                const pinyinEl = document.getElementById('pinyin');
+                if (polyphoneDict[puzzle.character]) {
+                    pinyinEl.textContent = `拼音: ${polyphoneDict[puzzle.character].join(' / ')}`;
+                }
+                
+                // 自动朗读汉字（包括多音字）
+                speakCharacter(puzzle.character);
+            } else {
+                for (let i = 0; i < components.length; i++) {
+                    const span = document.createElement('span');
+                    span.className = `component-item ${colors[i % colors.length]}`;
+                    span.textContent = components[i];
+                    content.appendChild(span);
+                    
+                    if (i < operators.length) {
+                        const opSpan = document.createElement('span');
+                        opSpan.className = 'component-item component-operator';
+                        opSpan.textContent = operators[i];
+                        content.appendChild(opSpan);
+                    }
+                }
+                
+                const equalSpan = document.createElement('span');
+                equalSpan.className = 'equal';
+                equalSpan.textContent = '= ?';
+                content.appendChild(equalSpan);
+            }
+
+            // 更新进度条
+            const progressBar = document.getElementById('progressBar');
+            const progress = ((state.currentPuzzleIndex + 1) / state.currentPuzzleData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            // 更新滑块位置
+            updateSliderPosition();
+        }
+
+        function handleCardClick() {
+            if (!state.isShowingAnswer) {
+                state.isShowingAnswer = true;
+                updatePuzzleDisplay();
+            } else {
+                if (state.currentPuzzleIndex === state.currentPuzzleData.length - 1) {
+                    alert('已经是最后一个了');
+                    return;
+                }
+                
+                state.isShowingAnswer = false;
+                state.currentPuzzleIndex++;
+                updatePuzzleDisplay();
+            }
+        }
+
+        // 进度条拖拽功能
+        function setupProgressSlider() {
+            const container = document.getElementById('progressContainer');
+            const slider = document.getElementById('progressSlider');
+            const tooltip = document.getElementById('progressTooltip');
+            
+            container.addEventListener('click', function(e) {
+                const rect = container.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                const newIndex = Math.min(Math.floor(percent * state.currentPuzzleData.length), state.currentPuzzleData.length - 1);
+                
+                if (newIndex !== state.currentPuzzleIndex) {
+                    state.currentPuzzleIndex = newIndex;
+                    state.isShowingAnswer = false;
+                    updatePuzzleDisplay();
+                }
+            });
+            
+            let isDragging = false;
+            
+            slider.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                tooltip.style.display = 'block';
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                const rect = container.getBoundingClientRect();
+                let percent = (e.clientX - rect.left) / rect.width;
+                percent = Math.max(0, Math.min(1, percent));
+                
+                const newIndex = Math.min(Math.floor(percent * state.currentPuzzleData.length), state.currentPuzzleData.length - 1);
+                
+                if (state.currentPuzzleData[newIndex]) {
+                    tooltip.textContent = state.currentPuzzleData[newIndex].character;
+                    tooltip.style.left = `${percent * 100}%`;
+                }
+            });
+            
+            document.addEventListener('mouseup', function(e) {
+                if (!isDragging) return;
+                
+                isDragging = false;
+                tooltip.style.display = 'none';
+                
+                const rect = container.getBoundingClientRect();
+                let percent = (e.clientX - rect.left) / rect.width;
+                percent = Math.max(0, Math.min(1, percent));
+                
+                const newIndex = Math.min(Math.floor(percent * state.currentPuzzleData.length), state.currentPuzzleData.length - 1);
+                
+                if (newIndex !== state.currentPuzzleIndex) {
+                    state.currentPuzzleIndex = newIndex;
+                    state.isShowingAnswer = false;
+                    updatePuzzleDisplay();
+                }
+            });
+            
+            // 触摸事件支持
+            slider.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                tooltip.style.display = 'block';
+                e.preventDefault();
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                if (!isDragging) return;
+                
+                const touch = e.touches[0];
+                const rect = container.getBoundingClientRect();
+                let percent = (touch.clientX - rect.left) / rect.width;
+                percent = Math.max(0, Math.min(1, percent));
+                
+                const newIndex = Math.min(Math.floor(percent * state.currentPuzzleData.length), state.currentPuzzleData.length - 1);
+                
+                if (state.currentPuzzleData[newIndex]) {
+                    tooltip.textContent = state.currentPuzzleData[newIndex].character;
+                    tooltip.style.left = `${percent * 100}%`;
+                }
+            });
+            
+            document.addEventListener('touchend', function(e) {
+                if (!isDragging) return;
+                
+                isDragging = false;
+                tooltip.style.display = 'none';
+                
+                const touch = e.changedTouches[0];
+                const rect = container.getBoundingClientRect();
+                let percent = (touch.clientX - rect.left) / rect.width;
+                percent = Math.max(0, Math.min(1, percent));
+                
+                const newIndex = Math.min(Math.floor(percent * state.currentPuzzleData.length), state.currentPuzzleData.length - 1);
+                
+                if (newIndex !== state.currentPuzzleIndex) {
+                    state.currentPuzzleIndex = newIndex;
+                    state.isShowingAnswer = false;
+                    updatePuzzleDisplay();
+                }
+            });
+        }
+        
+        function updateSliderPosition() {
+            const slider = document.getElementById('progressSlider');
+            const container = document.getElementById('progressContainer');
+            if (!slider || !container) return;
+            
+            const progress = ((state.currentPuzzleIndex + 1) / state.currentPuzzleData.length) * 100;
+            slider.style.left = `${progress}%`;
+        }
+
+        // 语音朗读功能（支持多音字）
+        function speakCharacter(character) {
+            if (!('speechSynthesis' in window)) return;
+            
+            // 停止任何正在进行的朗读
+            window.speechSynthesis.cancel();
+            
+            // 检查是否为多音字
+            if (polyphoneDict[character]) {
+                // 朗读所有读音
+                polyphoneDict[character].forEach(pinyin => {
+                    const utterance = new SpeechSynthesisUtterance(character);
+                    utterance.lang = 'zh-CN';
+                    utterance.rate = 0.9;
+                    window.speechSynthesis.speak(utterance);
+                    
+                    // 添加短暂停顿
+                    const pause = new SpeechSynthesisUtterance(' ');
+                    pause.lang = 'zh-CN';
+                    window.speechSynthesis.speak(pause);
+                });
+            } else {
+                // 单音字朗读
+                const utterance = new SpeechSynthesisUtterance(character);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // 初始化
+        window.onload = function() {
+            setupProgressSlider();
+        };
+    </script>
+</body>
+</html>
