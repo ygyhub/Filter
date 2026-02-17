@@ -2,9 +2,9 @@
 # 更新时间：2026-02-17
 
 # === 核心业务===
-host, sso.taoyuangu.com, direct
-host, uums.taoyuangu.com, direct
-host, lxj.taoyuangu.com, direct
+#host, sso.taoyuangu.com, direct
+#host, uums.taoyuangu.com, direct
+#host, lxj.taoyuangu.com, direct
 
 # === 广告屏蔽 ===
 host, adfile.taoyuangu.com, reject
