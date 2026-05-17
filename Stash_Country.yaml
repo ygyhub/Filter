@@ -1,0 +1,32 @@
+proxy-groups:
+  # ------ 台湾自动选择 ------
+  - name: 🇹🇼 台湾自动
+    type: url-test
+    # 机场订阅的分流源名称，通常为 proxy，代表从这个节点池里筛选
+    use:
+      - proxy
+    # 使用正则表达式筛选包含 台湾、TW、Taiwan 的节点
+    filter: '(?i)台湾|TW|Taiwan|Tai'
+    url: http://cp.cloudflare.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  # ------ 日本自动选择 ------
+  - name: 🇯🇵 日本自动
+    type: url-test
+    use:
+      - proxy
+    filter: '(?i)日本|JP|Japan|Tokyo'
+    url: http://cp.cloudflare.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  # ------ 新加坡自动选择 ------
+  - name: 🇸🇬 新加坡自动
+    type: url-test
+    use:
+      - proxy
+    filter: '(?i)新加坡|SG|Singapore'
+    url: http://cp.cloudflare.com/generate_204
+    interval: 300
+    tolerance: 50
