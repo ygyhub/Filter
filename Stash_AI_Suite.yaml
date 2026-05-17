@@ -1,0 +1,11 @@
+proxy-groups:
+  # 这里的 name 必须和机场原本的策略组名字一模一样（注意大小写和空格）
+  - name: AI Suite
+    type: url-test
+    # 提取所有节点，不需要去管机场底层的提供者叫什么名字
+    include-all: true
+    # 过滤出台湾、新加坡、日本的节点
+    filter: '(?i)台湾|TW|Taiwan|Tai|新加坡|SG|Singapore|日本|JP|Japan'
+    url: http://cp.cloudflare.com/generate_204
+    interval: 300
+    tolerance: 50
